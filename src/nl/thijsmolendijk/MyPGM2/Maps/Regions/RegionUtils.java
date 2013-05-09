@@ -95,10 +95,10 @@ public class RegionUtils {
 		String[] maxData = tag.getAttribute("max").split(",");
 		min.setX(Integer.parseInt(minData[0]));
 		min.setY(Integer.parseInt(minData[1]));
-		min.setZ(Integer.parseInt(minData[2]));
+		min.setZ(0);
 		max.setX(Integer.parseInt(maxData[0]));
 		max.setY(Integer.parseInt(maxData[1]));
-		max.setZ(Integer.parseInt(maxData[2]));
+		max.setZ(0);
 		return new RegionRectangle(min, max, inverted);
 	}
 	

@@ -9,7 +9,6 @@ import nl.thijsmolendijk.MyPGM2.PlayerTools;
 import nl.thijsmolendijk.MyPGM2.StringUtils;
 import nl.thijsmolendijk.MyPGM2.Maps.MapData;
 import nl.thijsmolendijk.MyPGM2.Maps.MapManager;
-import nl.thijsmolendijk.MyPGM2.Teams.Team;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -42,13 +41,10 @@ public class MapCommands {
 		}
 		MapData found = MapManager.get().matchMap(args.getJoinedStrings(0));
 		Validate.notNull(found, "No maps found!");
-		for (Team t : found.teamManager.teams)
-			System.out.println(t.name);
 		sender.sendMessage(StringUtils.padMessage(found.name, "-", ChatColor.GOLD, ChatColor.LIGHT_PURPLE));
 		sender.sendMessage(ChatColor.AQUA+""+ChatColor.BOLD+"Objective: "+ChatColor.RESET+ChatColor.GREEN+found.objective+"\n\n");
 		sender.sendMessage(ChatColor.AQUA+""+ChatColor.BOLD+"Authors: ");
 		for (String au : found.getAuthors()) {
-			System.out.println(found.getAuthors().toString());
 			if (!found.authors.get(au).equals(""))
 				sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"* "+ChatColor.RESET+""+ChatColor.GREEN+au+ChatColor.LIGHT_PURPLE+" ("+found.authors.get(au)+")");
 			else 
@@ -57,7 +53,6 @@ public class MapCommands {
 		}
 		sender.sendMessage(ChatColor.AQUA+""+ChatColor.BOLD+"Contributors: ");
 		for (String co : found.contributors.keySet()) {
-			System.out.println(found.getAuthors().toString());
 			if (!found.contributors.get(co).equals(""))
 				sender.sendMessage(ChatColor.GOLD+""+ChatColor.BOLD+"* "+ChatColor.RESET+""+ChatColor.GREEN+co+ChatColor.LIGHT_PURPLE+" ("+found.contributors.get(co)+")");
 			else 
@@ -95,7 +90,7 @@ public class MapCommands {
 			}
 		}
 		//Check if the map exists and is valid
-		File path = new File("Maps/", found.fileLocation);
+		File path = new File("../Maps/", found.fileLocation);
 		if (!(new File(path,"level.dat").exists())) {
 			p.sendMessage(ChatColor.RED+"No level.dat file found inside world folder");
 		}

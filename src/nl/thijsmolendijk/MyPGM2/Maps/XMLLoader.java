@@ -6,6 +6,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import nl.thijsmolendijk.MyPGM2.Tools;
+import nl.thijsmolendijk.MyPGM2.Maps.Kits.Kit;
+import nl.thijsmolendijk.MyPGM2.Maps.Kits.KitUtils;
 import nl.thijsmolendijk.MyPGM2.Maps.Regions.RegionUtils;
 import nl.thijsmolendijk.MyPGM2.Teams.Team;
 
@@ -33,8 +35,9 @@ public class XMLLoader {
 		data = loadAuthors(main, data);
 		data = loadContributors(main, data);
 		data = loadTeams(main, data);
+		data = loadKits(main, data);
 		data = loadSpawns(main, data);
-		//data = loadRegions(main, data);
+		data = loadRegions(main, data);
 		return data;
 	}
 
@@ -45,9 +48,7 @@ public class XMLLoader {
 			Node n = children.item(i);
 			if (n.getNodeType() == Node.ELEMENT_NODE && n.getParentNode().getNodeName().equals("authors")) {
 				Element e = (Element) n;
-				System.out.println(e.getTextContent());
 				d.authors.put(e.getTextContent(), e.getAttribute("contribution"));
-				System.out.println(d.authors.toString());
 			}
 		}
 		return d;
@@ -60,9 +61,7 @@ public class XMLLoader {
 			Node n = children.item(i);
 			if (n.getNodeType() == Node.ELEMENT_NODE && n.getParentNode().getNodeName().equals("contributors")) {
 				Element e = (Element) n;
-				System.out.println(e.getTextContent());
 				d.contributors.put(e.getTextContent(), e.getAttribute("contribution"));
-				System.out.println(d.contributors.toString());
 			}
 		}
 		return d;
@@ -127,6 +126,23 @@ public class XMLLoader {
 				if (!RegionUtils.isValidRegionTag(e))
 					continue;
 				d.regions.put(e.getAttribute("name"), RegionUtils.parseRegion(e, false));
+			}
+		}
+		return d;
+	}
+	
+	private static MapData loadKits(Element m, MapData d) {
+		if (m.getElementsByTagName("kits").getLength() < 1)
+			return d;
+		NodeList children = ((Element) m.getElementsByTagName("kits").item(0)).getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node n = children.item(i);
+			if (n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals("kit")) {
+				Element e = (Element) n;
+				Kit parent = null;
+				if (e.hasAttribute("parents"))
+					parent = d.kits.get(e.getAttribute("parents"));
+				d.kits.put(e.getAttribute("name"), KitUtils.parseKit(e, parent));
 			}
 		}
 		return d;

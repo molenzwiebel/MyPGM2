@@ -17,12 +17,11 @@ public class MapManager {
 	}
 	
 	public void loadMaps() throws Exception {
-		File mapFolder = new File("Maps/");
+		File mapFolder = new File("../Maps/");
 		if (!mapFolder.exists())
 			throw new Exception("[MyPGM2] Failed to find the Maps folder!");
 		for (File mapFile : mapFolder.listFiles()) {
 			if (!mapFile.isDirectory()) continue;
-			System.out.println("[MyPGM2] Found map at: "+mapFile.getAbsolutePath());
 			loadedMaps.add(XMLLoader.load(new File(mapFile, "/map.xml"), mapFile.getName()));
 		}
 		for (MapData m : loadedMaps)

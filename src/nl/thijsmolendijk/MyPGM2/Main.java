@@ -71,26 +71,22 @@ public class Main extends JavaPlugin {
 		} catch (CommandPermissionsException e) {
 			sender.sendMessage(ChatColor.RED + "You don't have permission.");
 		} catch (MissingNestedCommandException e) {
-			sender.sendMessage(ChatColor.RED + "NestedCommand:"+ e.getUsage());
-			e.printStackTrace();
-		} catch (CommandUsageException e) {
-			sender.sendMessage(ChatColor.RED + "Usage:"+ e.getMessage());
 			sender.sendMessage(ChatColor.RED + e.getUsage());
 			e.printStackTrace();
+		} catch (CommandUsageException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			sender.sendMessage(ChatColor.RED + e.getUsage());
 		} catch (WrappedCommandException e) {
 			if (e.getCause() instanceof NumberFormatException) {
 				sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
 			} else if (e.getCause() instanceof IllegalArgumentException) {
 				sender.sendMessage(ChatColor.RED+e.getMessage().replace("java.lang.IllegalArgumentException: ", ""));
-				e.printStackTrace();
 			}
 			else {
 				sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
-				e.printStackTrace();
 			}
 		} catch (CommandException e) {
-			sender.sendMessage(ChatColor.RED + "Command:"+  e.getMessage());
-			e.printStackTrace();
+			sender.sendMessage(ChatColor.RED +  e.getMessage());
 		}
 		return true;
 	}

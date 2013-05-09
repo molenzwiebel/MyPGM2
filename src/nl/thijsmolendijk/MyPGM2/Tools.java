@@ -1,5 +1,7 @@
 package nl.thijsmolendijk.MyPGM2;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
 
 public class Tools {
@@ -23,4 +25,20 @@ public class Tools {
 		return color;
 	}
 	
+	public static String match(List<String> list, String str) {
+		String found = null;
+        String lowerName = str.toLowerCase();
+        int delta = Integer.MAX_VALUE;
+        for (String item : list) {
+            if (item.toLowerCase().startsWith(lowerName)) {
+                int curDelta = item.length() - lowerName.length();
+                if (curDelta < delta) {
+                    found = item;
+                    delta = curDelta;
+                }
+                if (curDelta == 0) break;
+            }
+        }
+        return found;
+	}	
 }
