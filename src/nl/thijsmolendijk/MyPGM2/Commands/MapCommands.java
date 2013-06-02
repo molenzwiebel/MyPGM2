@@ -9,6 +9,7 @@ import nl.thijsmolendijk.MyPGM2.PlayerTools;
 import nl.thijsmolendijk.MyPGM2.StringUtils;
 import nl.thijsmolendijk.MyPGM2.Maps.MapData;
 import nl.thijsmolendijk.MyPGM2.Maps.MapManager;
+import nl.thijsmolendijk.MyPGM2.Teams.TeamManager;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -26,7 +27,7 @@ public class MapCommands {
 	@Command(
 			aliases = { "map" },
 			desc = "Reload MyPGM2",
-			min = 1,
+			min = 0,
 			max = -1
 			)
 	public static void mapCommand(final CommandContext args, final CommandSender sender) throws CommandException {
@@ -34,12 +35,11 @@ public class MapCommands {
 			sender.sendMessage(ChatColor.RED+"You might want to get in-game to do that!");
 			//return;
 		}
-		if (MapManager.get().currentMap == null) {
-			sender
-			.sendMessage(ChatColor.RED+"There's no map running!");
-			//return;
-		}
-		MapData found = MapManager.get().matchMap(args.getJoinedStrings(0));
+		MapData found;
+		if (args.argsLength() == 0)
+			found = MapManager.get().currentMap;
+		else
+			found = MapManager.get().matchMap(args.getJoinedStrings(0));
 		Validate.notNull(found, "No maps found!");
 		sender.sendMessage(StringUtils.padMessage(found.name, "-", ChatColor.GOLD, ChatColor.LIGHT_PURPLE));
 		sender.sendMessage(ChatColor.AQUA+""+ChatColor.BOLD+"Objective: "+ChatColor.RESET+ChatColor.GREEN+found.objective+"\n\n");
@@ -80,9 +80,7 @@ public class MapCommands {
 				
 				pToTP.teleport(mainWorld.getSpawnLocation());
 			}
-			p.sendMessage(ChatColor.GREEN+"Unloading world");
 			Bukkit.getServer().unloadWorld(oldWorldName, false);
-			p.sendMessage(ChatColor.GREEN+"Deleting _COPY world files");
 			try {
 				FileTools.deleteFolder(new File(oldWorldName));
 			} catch (IOException e) {
@@ -103,6 +101,14 @@ public class MapCommands {
 		//Copying succeeded, load the world and send all players to the new world
 		World newWorld = Bukkit.getServer().createWorld(new WorldCreator(found.fileLocation+"_COPY").generator(new EmptyWorldGenerator()));
 		MapManager.get().currentMap = found;
-		PlayerTools.tpAll(newWorld.getSpawnLocation());
+		TeamManager.updateBukkitScoreboards();
+		MapManager.get().currentMap.world = newWorld;
+		String mess = StringUtils.padMessage("The match has started!", "#", ChatColor.LIGHT_PURPLE, ChatColor.AQUA); 
+		String mes = ChatColor.LIGHT_PURPLE+StringUtils.repeat("#", mess.length()-2);
+		Bukkit.getServer().broadcastMessage(mes);
+		Bukkit.getServer().broadcastMessage(mess);
+		Bukkit.getServer().broadcastMessage(mes);
+		Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE+"Now playing "+ChatColor.GOLD.toString()+found.name+ChatColor.LIGHT_PURPLE+" by "+ChatColor.AQUA+StringUtils.authorList(MapManager.get().currentMap.authors.keySet()));
+		PlayerTools.joinAll(found.teamManager.matchTeam("Obs"));
 	}
 }

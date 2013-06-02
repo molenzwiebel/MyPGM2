@@ -3,12 +3,17 @@ package nl.thijsmolendijk.MyPGM2;
 import nl.thijsmolendijk.MyPGM2.Commands.AdminCommands;
 import nl.thijsmolendijk.MyPGM2.Commands.MapCommands;
 import nl.thijsmolendijk.MyPGM2.Commands.MatchCommands;
+import nl.thijsmolendijk.MyPGM2.Listeners.DeathListener;
+import nl.thijsmolendijk.MyPGM2.Listeners.JoinLeaveListener;
+import nl.thijsmolendijk.MyPGM2.Listeners.ObserverListener;
 import nl.thijsmolendijk.MyPGM2.Maps.MapManager;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -29,12 +34,17 @@ public class Main extends JavaPlugin {
 		return instance;
 	}
 
+	public static Scoreboard mainSB;
 
 	@Override
 	public void onEnable() {
 		System.out.println("[MyPGM2] Loading maps");
 		instance = this;
 		this.setupCommands();
+		new DeathListener();
+		//new ObserverListener();
+		new JoinLeaveListener();
+		mainSB = Bukkit.getScoreboardManager().getNewScoreboard();
 		try {
 			MapManager.get().loadMaps();
 		} catch (Exception e) {
@@ -84,6 +94,7 @@ public class Main extends JavaPlugin {
 			}
 			else {
 				sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
+				e.printStackTrace();
 			}
 		} catch (CommandException e) {
 			sender.sendMessage(ChatColor.RED +  e.getMessage());

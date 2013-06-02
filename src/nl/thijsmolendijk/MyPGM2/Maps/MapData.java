@@ -8,11 +8,15 @@ import nl.thijsmolendijk.MyPGM2.Maps.Kits.Kit;
 import nl.thijsmolendijk.MyPGM2.Maps.Regions.IRegion;
 import nl.thijsmolendijk.MyPGM2.Teams.TeamManager;
 
+import org.bukkit.World;
+
 public class MapData {
 	public String name;
 	public String version;
 	public String objective;
 	public String fileLocation;
+	public World world;
+	public boolean inProgress = true;
 	public HashMap<String, IRegion> regions = new HashMap<String, IRegion>();
 	public TeamManager teamManager = new TeamManager();
 	public HashMap<String, String> authors = new HashMap<String, String>();

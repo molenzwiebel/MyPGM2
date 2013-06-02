@@ -181,6 +181,7 @@ public class KitUtils {
 			dur = 1;
 		if (dur == -1)
 			dur = Integer.MAX_VALUE;
+		System.out.println(""+eff.toString()+", "+dur+", "+amp);
 		return new PotionEffect(eff, dur, amp, true);
 	}
 }

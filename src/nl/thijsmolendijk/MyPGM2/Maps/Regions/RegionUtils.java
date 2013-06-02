@@ -12,44 +12,41 @@ public class RegionUtils {
 			return false;
 		Element e = (Element) tag;
 		if (e.getNodeName().equals("cuboid")) {
-			if (e.hasAttribute("min") && e.hasAttribute("max") && e.hasAttribute("name"))
+			if (e.hasAttribute("min") && e.hasAttribute("max"))
 				return true;
 			return false;
 		}
 		if (e.getNodeName().equals("rectangle")) {
-			if (e.hasAttribute("min") && e.hasAttribute("max") && e.hasAttribute("name"))
+			if (e.hasAttribute("min") && e.hasAttribute("max"))
 				return true;
 			return false;
 		}
 		if (e.getNodeName().equals("cylinder")) {
-			if (e.hasAttribute("base") && e.hasAttribute("radius") && e.hasAttribute("name") && e.hasAttribute("height"))
+			if (e.hasAttribute("base") && e.hasAttribute("radius") && e.hasAttribute("height"))
 				return true;
 			return false;
 		}
 		if (e.getNodeName().equals("circle")) {
-			if (e.hasAttribute("center") && e.hasAttribute("radius") && e.hasAttribute("name"))
+			if (e.hasAttribute("center") && e.hasAttribute("radius"))
 				return true;
 			return false;
 		}
 		if (e.getNodeName().equals("sphere")) {
-			if (e.hasAttribute("center") && e.hasAttribute("radius") && e.hasAttribute("name"))
+			if (e.hasAttribute("center") && e.hasAttribute("radius"))
 				return true;
 			return false;
 		}
 		if (e.getNodeName().equals("union")) {
-			if (e.hasAttribute("name"))
-				return true;
-			return false;
+			return true;
 		}
 		if (e.getNodeName().equals("complement")) {
-			if (e.hasAttribute("name"))
-				return true;
-			return false;
+			return true;
 		}
 		if (e.getNodeName().equals("negative")) {
-			if (e.hasAttribute("name"))
-				return true;
-			return false;
+			return true;
+		}
+		if (e.getNodeName().equals("point")) {
+			return true;
 		}
 		return false;
 	}
@@ -71,6 +68,8 @@ public class RegionUtils {
 			return RegionUtils.parseComplement(tag, inverted);
 		if (tag.getNodeName().equals("negative"))
 			return RegionUtils.parseNegative(tag);
+		if (tag.getNodeName().equals("point"))
+			return RegionUtils.parsePoint(tag, inverted);
 		return null;
 	}
 	
@@ -79,12 +78,12 @@ public class RegionUtils {
 		Location max = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 		String[] minData = tag.getAttribute("min").split(",");
 		String[] maxData = tag.getAttribute("max").split(",");
-		min.setX(Integer.parseInt(minData[0]));
-		min.setY(Integer.parseInt(minData[1]));
-		min.setZ(Integer.parseInt(minData[2]));
-		max.setX(Integer.parseInt(maxData[0]));
-		max.setY(Integer.parseInt(maxData[1]));
-		max.setZ(Integer.parseInt(maxData[2]));
+		min.setX(Double.parseDouble(minData[0]));
+		min.setY(Double.parseDouble(minData[1]));
+		min.setZ(Double.parseDouble(minData[2]));
+		max.setX(Double.parseDouble(maxData[0]));
+		max.setY(Double.parseDouble(maxData[1]));
+		max.setZ(Double.parseDouble(maxData[2]));
 		return new RegionCuboid(min, max, inverted);
 	}
 	
@@ -93,11 +92,11 @@ public class RegionUtils {
 		Location max = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 		String[] minData = tag.getAttribute("min").split(",");
 		String[] maxData = tag.getAttribute("max").split(",");
-		min.setX(Integer.parseInt(minData[0]));
-		min.setY(Integer.parseInt(minData[1]));
+		min.setX(Double.parseDouble(minData[0]));
+		min.setY(Double.parseDouble(minData[1]));
 		min.setZ(0);
-		max.setX(Integer.parseInt(maxData[0]));
-		max.setY(Integer.parseInt(maxData[1]));
+		max.setX(Double.parseDouble(maxData[0]));
+		max.setY(Double.parseDouble(maxData[1]));
 		max.setZ(0);
 		return new RegionRectangle(min, max, inverted);
 	}
@@ -105,31 +104,40 @@ public class RegionUtils {
 	public static IRegion parseCylinder(Element tag, boolean inverted) {
 		Location base = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 		String[] minData = tag.getAttribute("base").split(",");
-		base.setX(Integer.parseInt(minData[0]));
-		base.setY(Integer.parseInt(minData[1]));
-		base.setZ(Integer.parseInt(minData[2]));
-		int radius = Integer.parseInt(tag.getAttribute("radius"));
-		int height = Integer.parseInt(tag.getAttribute("height"));
+		base.setX(Double.parseDouble(minData[0]));
+		base.setY(Double.parseDouble(minData[1]));
+		base.setZ(Double.parseDouble(minData[2]));
+		int radius = (int) Double.parseDouble(tag.getAttribute("radius"));
+		int height = (int) Double.parseDouble(tag.getAttribute("height"));
 		return new RegionCilinder(base, radius, height, inverted);
+	}
+	
+	public static IRegion parsePoint(Element tag, boolean inverted) {
+		Location base = new Location(Bukkit.getWorld("world"), 0, 0, 0);
+		String[] minData = tag.getTextContent().split(",");
+		base.setX(Double.parseDouble(minData[0]));
+		base.setY(Double.parseDouble(minData[1]));
+		base.setZ(Double.parseDouble(minData[2]));
+		return new RegionPoint(base, inverted);
 	}
 	
 	public static IRegion parseCircle(Element tag, boolean inverted) {
 		Location base = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 		String[] minData = tag.getAttribute("center").split(",");
-		base.setX(Integer.parseInt(minData[0]));
-		base.setY(Integer.parseInt(minData[1]));
-		base.setZ(Integer.parseInt(minData[2]));
-		int radius = Integer.parseInt(tag.getAttribute("radius"));
+		base.setX(Double.parseDouble(minData[0]));
+		base.setY(Double.parseDouble(minData[1]));
+		base.setZ(Double.parseDouble(minData[2]));
+		int radius = (int) Double.parseDouble(tag.getAttribute("radius"));
 		return new RegionCircle(base, radius, inverted);
 	}
 	
 	public static IRegion parseSphere(Element tag, boolean inverted) {
 		Location base = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 		String[] minData = tag.getAttribute("center").split(",");
-		base.setX(Integer.parseInt(minData[0]));
-		base.setY(Integer.parseInt(minData[1]));
-		base.setZ(Integer.parseInt(minData[2]));
-		int radius = Integer.parseInt(tag.getAttribute("radius"));
+		base.setX(Double.parseDouble(minData[0]));
+		base.setY(Double.parseDouble(minData[1]));
+		base.setZ(Double.parseDouble(minData[2]));
+		int radius = (int) Double.parseDouble(tag.getAttribute("radius"));
 		return new RegionSphere(base, radius, inverted);
 	}
 	

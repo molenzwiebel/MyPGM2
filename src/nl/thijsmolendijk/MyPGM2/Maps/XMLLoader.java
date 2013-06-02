@@ -8,12 +8,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import nl.thijsmolendijk.MyPGM2.Tools;
 import nl.thijsmolendijk.MyPGM2.Maps.Kits.Kit;
 import nl.thijsmolendijk.MyPGM2.Maps.Kits.KitUtils;
+import nl.thijsmolendijk.MyPGM2.Maps.Regions.IRegion;
 import nl.thijsmolendijk.MyPGM2.Maps.Regions.RegionUtils;
 import nl.thijsmolendijk.MyPGM2.Teams.Team;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -68,7 +67,7 @@ public class XMLLoader {
 	}
 	
 	private static MapData loadTeams(Element main, MapData d) {
-		Team obs = new Team();
+		Team obs = new Team("Observers", ChatColor.AQUA);
 		obs.color = ChatColor.AQUA;
 		obs.maxPlayers = Integer.MAX_VALUE;
 		obs.name = "Observers";
@@ -82,7 +81,7 @@ public class XMLLoader {
 				ChatColor c = Tools.matchColor(e.getAttribute("color"));
 				int maxPlayers = Integer.parseInt(e.getAttribute("max"));
 				String name = n.getTextContent();
-				Team t = new Team();
+				Team t = new Team(name, c);
 				t.color = c;
 				t.maxPlayers = maxPlayers;
 				t.name = name;
@@ -99,18 +98,38 @@ public class XMLLoader {
 			Node n = children.item(i);
 			if (n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals("spawn")) {
 				Element e = (Element) n;
-				Team t = d.teamManager.teamForName(e.getAttribute("team"));
-				//For now, just get a point location
-				if (e.getElementsByTagName("point").getLength() < 1)
+				Team t = d.teamManager.matchTeam(e.getAttribute("team"));
+				Kit k;
+				if (e.hasAttribute("kit"))
+					k = d.kits.get(e.getAttribute("kit"));
+				else
+					k = new Kit();
+				
+				if (!RegionUtils.isValidRegionTag(e.getFirstChild()))
 					return d;
-				Element point = (Element) e.getElementsByTagName("point").item(0);
 				int yaw = Integer.parseInt(e.getAttribute("yaw"));
-				int x = Integer.parseInt(point.getTextContent().split(",")[0]);
-				int y = Integer.parseInt(point.getTextContent().split(",")[1]);
-				int z = Integer.parseInt(point.getTextContent().split(",")[2]);
-				Location spawn = new Location(Bukkit.getWorld(d.name+"_COPY"), x, y, z);
-				spawn.setYaw(yaw);
-				t.spawn = spawn;
+				IRegion r = RegionUtils.parseRegion((Element) e.getFirstChild(), false);
+				t.spawnRegion = r;
+				t.spawnYaw = yaw;
+				t.spawnKit = k;
+			}
+			if (n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals("default")) {
+				Element e = (Element) n;
+				Team t = d.teamManager.teamForName("Observers");
+				if (!RegionUtils.isValidRegionTag(e.getFirstChild()))
+					return d;
+				
+				Kit k;
+				if (e.hasAttribute("kit"))
+					k = d.kits.get(e.getAttribute("kit"));
+				else
+					k = new Kit();
+				
+				int yaw = Integer.parseInt(e.getAttribute("yaw"));
+				IRegion r = RegionUtils.parseRegion((Element) e.getFirstChild(), false);
+				t.spawnRegion = r;
+				t.spawnYaw = yaw;
+				t.spawnKit = k;
 			}
 		}
 		return d;

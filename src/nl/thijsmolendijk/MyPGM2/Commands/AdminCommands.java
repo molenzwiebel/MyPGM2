@@ -2,10 +2,12 @@ package nl.thijsmolendijk.MyPGM2.Commands;
 
 import java.util.List;
 
+import nl.thijsmolendijk.MyPGM2.Main;
 import nl.thijsmolendijk.MyPGM2.StringUtils;
 import nl.thijsmolendijk.MyPGM2.Maps.MapData;
 import nl.thijsmolendijk.MyPGM2.Maps.MapManager;
 import nl.thijsmolendijk.MyPGM2.Maps.Kits.Kit;
+import nl.thijsmolendijk.MyPGM2.Timers.RestartTimer;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -24,16 +26,23 @@ public class AdminCommands {
 	@Command(
 			aliases = { "restart" },
 			desc = "Restart the server",
+			min = 1,
+			max = 1
+			)
+	public static void restart(final CommandContext args, final CommandSender sender) throws CommandException {
+		sender.sendMessage(ChatColor.GREEN+"[MyPGM2] Restarting in "+args.getInteger(0) + " seconds");
+		new RestartTimer(args.getInteger(0));
+	}
+	
+	@Command(
+			aliases = { "cancel" },
+			desc = "Cancel all the countdowns",
 			min = 0,
 			max = 0
 			)
-	public static void restart(final CommandContext args, final CommandSender sender) throws CommandException {
-		System.out.println("[MyPGM2] Restarting...");
-		sender.sendMessage(ChatColor.GREEN+"[MyPGM2] Restarting...");
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			p.kickPlayer(ChatColor.RED+"Server restarting. "+ChatColor.AQUA.toString()+ChatColor.BOLD+"Rejoin!");
-		}
-		System.exit(999);
+	public static void cancel(final CommandContext args, final CommandSender sender) throws CommandException {
+		sender.sendMessage(ChatColor.GREEN+"Cancelled countdowns");
+		Bukkit.getScheduler().cancelTasks(Main.get());
 	}
 
 
