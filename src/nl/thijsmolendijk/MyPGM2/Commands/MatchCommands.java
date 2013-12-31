@@ -16,7 +16,7 @@ public class MatchCommands {
 
 	@Command(
 			aliases = { "join" },
-			desc = "Reload MyPGM2",
+			desc = "Joins a team",
 			min = 1,
 			max = -1
 			)
